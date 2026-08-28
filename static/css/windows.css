@@ -6,8 +6,12 @@
     flex-direction: column;
     min-width: 280px;
     min-height: 180px;
-    background: var(--kos-bg-1);
-    border: 1px solid var(--kos-border);
+    background: var(--kos-glass-bg-strong);
+    
+    backdrop-filter: blur(24px) saturate(130%);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    
+    border: 1px solid var(--kos-glass-border);
     border-radius: var(--kos-radius-md);
     box-shadow: var(--kos-shadow-md);
     overflow: hidden;

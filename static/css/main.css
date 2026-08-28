@@ -32,6 +32,12 @@
 
     --kos-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --kos-font-mono: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, Monaco, monospace;
+
+    --kos-glass-bg: rgba(27, 30, 38, 0.58);
+        --kos-glass-bg-strong: rgba(27, 30, 38, 0.72);
+        --kos-glass-border: rgba(255, 255, 255, 0.10);
+        --kos-glass-blur: 20px;
+        --kos-glass-saturation: 125%;
 }
 
 [data-theme="light"] {
@@ -45,6 +51,10 @@
     --kos-text-1: #40434c;
     --kos-text-2: #767b88;
     --kos-wallpaper: linear-gradient(160deg, #dfe6f5 0%, #eef1f8 55%, #e7e0f2 100%);
+
+    --kos-glass-bg: rgba(255, 255, 255, 0.58);
+        --kos-glass-bg-strong: rgba(255, 255, 255, 0.72);
+        --kos-glass-border: rgba(0, 0, 0, 0.08);
 }
 
 * {
