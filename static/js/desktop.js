@@ -6,6 +6,7 @@
 const KhangDesktop = (() => {
     const ICONS = [
         { id: "explorer", label: "Explorer", icon: "📁" },
+        { id: "novabrowser", label: "NovaBrowser", icon: "🌐" },
         { id: "monitor", label: "System Monitor", icon: "📊" },
         { id: "settings", label: "Settings", icon: "⚙️" },
         { id: "terminal", label: "Terminal", icon: "💻" },
