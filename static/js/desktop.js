@@ -26,6 +26,38 @@ const KhangDesktop = (() => {
         return Math.round(value / GRID_SIZE) * GRID_SIZE;
     }
 
+    function findFreeGridPosition(el, left, top) {
+        const maxLeft = container.clientWidth - el.offsetWidth;
+        const maxTop = container.clientHeight - el.offsetHeight;
+
+        left = Math.max(0, Math.min(snapToGrid(left), maxLeft));
+        top = Math.max(0, Math.min(snapToGrid(top), maxTop));
+
+        const icons = [...container.querySelectorAll(".desktop-icon")]
+            .filter((other) => other !== el);
+
+        while (true) {
+            const occupied = icons.some((other) => {
+                return other.offsetLeft === left && other.offsetTop === top;
+            });
+
+            if (!occupied) {
+                return { left, top };
+            }
+
+            top += GRID_SIZE;
+
+            if (top > maxTop) {
+                top = 0;
+                left += GRID_SIZE;
+            }
+
+            if (left > maxLeft) {
+                return { left: 0, top: 0 };
+            }
+        }
+    }
+
     function toggleGrid() {
         gridEnabled = !gridEnabled;
         localStorage.setItem("khangos-desktop-grid", String(gridEnabled));
