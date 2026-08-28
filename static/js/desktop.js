@@ -15,6 +15,35 @@ const KhangDesktop = (() => {
     const container = document.getElementById("desktop-icons");
     const desktop = document.getElementById("desktop");
 
+    async function loadBingWallpaper() {
+        try {
+            const response = await fetch("/api/wallpaper");
+            const data = await response.json();
+
+            if (!data.success || !data.url) {
+                throw new Error("Invalid wallpaper response");
+            }
+
+            const image = new Image();
+
+            image.onload = () => {
+                desktop.style.setProperty(
+                    "--khangos-wallpaper",
+                    `url("${data.url}")`
+                );
+                desktop.classList.add("wallpaper-loaded");
+            };
+
+            image.onerror = () => {
+                console.error("Failed to load Bing wallpaper.");
+            };
+
+            image.src = data.url;
+        } catch (error) {
+            console.error("Failed to load Bing Image of the Day:", error);
+        }
+    }
+
     const GRID_SIZE = 100;
     let gridEnabled = localStorage.getItem("khangos-desktop-grid") === "true";
 
@@ -184,6 +213,7 @@ const KhangDesktop = (() => {
 
     function init() {
         render();
+        loadBingWallpaper();
         desktop.addEventListener("mousedown", (evt) => {
             if (evt.target === desktop || evt.target === container) deselectAll();
         });

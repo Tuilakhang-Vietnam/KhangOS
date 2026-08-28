@@ -164,6 +164,38 @@ def api_properties():
     return jsonify({"success": True, "properties": info})
 
 
+@app.route("/api/wallpaper")
+def api_wallpaper():
+    url = "https://www.bing.com/HPImageArchive.aspx"
+    params = {
+        "format": "js",
+        "idx": 0,
+        "n": 1,
+        "mkt": "vi-VN",
+    }
+
+    response = requests.get(url, params=params, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    if not data.get("images"):
+        return _error("Bing did not return an image.", 502)
+
+    image = data["images"][0]
+
+    image_url = image["url"]
+
+    if image_url.startswith("/"):
+        image_url = "https://www.bing.com" + image_url
+
+    return jsonify({
+        "success": True,
+        "url": image_url,
+        "title": image.get("title", ""),
+        "copyright": image.get("copyright", ""),
+    })
+
 # ---------------------------------------------------------------------------
 # System API
 # ---------------------------------------------------------------------------
@@ -175,3 +207,5 @@ def api_system_status():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=False)
+
+import requests
