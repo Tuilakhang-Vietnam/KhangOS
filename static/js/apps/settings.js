@@ -154,7 +154,7 @@ const KhangSettingsStore = (() => {
             if (wp.type === "bing-iotd") {
                 // Placeholder trước khi Bing trả ảnh
                 swatch.style.background = wp.value;
-                swatch.classList.add("wallpaper-iotd");
+                swatch.classList.add("wallpaper-iotd-swatch");
 
                 const loading = document.createElement("span");
                 loading.className = "wallpaper-iotd-label";
