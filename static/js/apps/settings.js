@@ -135,65 +135,6 @@ const KhangSettingsStore = (() => {
         wallpaperSection.className = "settings-section";
         wallpaperSection.innerHTML = "<h4>Wallpaper</h4>";
 
-        const iotdButton = document.createElement("button");
-        iotdButton.className = "wallpaper-iotd";
-        iotdButton.textContent = "🌄 Image of the Day";
-
-        iotdButton.addEventListener("click", async () => {
-            iotdButton.disabled = true;
-            iotdButton.textContent = "🌄 Loading...";
-
-            try {
-                const response = await fetch("/api/wallpaper");
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (!data.success || !data.url) {
-                    throw new Error(data.error || "No wallpaper returned.");
-                }
-
-                const wallpaper = {
-                    type: "bing-iotd",
-                    url: data.url,
-                    title: data.title || "",
-                    copyright: data.copyright || "",
-                };
-
-                KhangSettingsStore.update({
-                    wallpaper,
-                });
-
-                // Áp dụng ngay lập tức
-                document.documentElement.style.setProperty(
-                    "--kos-wallpaper",
-                    `url("${data.url}")`
-                );
-
-                iotdButton.classList.add("active");
-
-                showNotification(
-                    "Personalization",
-                    "Bing Image of the Day đã được đặt làm hình nền."
-                );
-            } catch (error) {
-                console.error("Bing IOTD error:", error);
-
-                showNotification(
-                    "Personalization",
-                    "Không thể tải Bing Image of the Day."
-                );
-            } finally {
-                iotdButton.disabled = false;
-                iotdButton.textContent = "🌄 Image of the Day";
-            }
-        });
-
-        wallpaperSection.appendChild(iotdButton);
-
         const swatchGroup = document.createElement("div");
         swatchGroup.className = "wallpaper-swatches";
         KhangSettingsStore.WALLPAPERS.forEach((wp) => {
