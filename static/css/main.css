@@ -1,0 +1,197 @@
+/* main.css - reset, design tokens, and shared utility styles for KhangOS */
+
+:root {
+    /* --- Dark theme (default) --- */
+    --kos-bg-0: #14161c;
+    --kos-bg-1: #1b1e26;
+    --kos-bg-2: #23272f;
+    --kos-bg-3: #2c313c;
+    --kos-border: rgba(255, 255, 255, 0.08);
+    --kos-border-strong: rgba(255, 255, 255, 0.16);
+    --kos-text-0: #f2f3f5;
+    --kos-text-1: #c7cbd4;
+    --kos-text-2: #8b90a0;
+    --kos-accent: #6c8cff;
+    --kos-accent-strong: #7f9dff;
+    --kos-danger: #ff6b6b;
+    --kos-success: #4cd68a;
+    --kos-warning: #ffb547;
+
+    --kos-radius-sm: 6px;
+    --kos-radius-md: 10px;
+    --kos-radius-lg: 16px;
+
+    --kos-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+    --kos-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --kos-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.45);
+
+    --kos-transition-fast: 120ms ease;
+    --kos-transition-normal: 200ms ease;
+
+    --kos-wallpaper: linear-gradient(160deg, #1c2030 0%, #12131a 55%, #1a1425 100%);
+
+    --kos-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --kos-font-mono: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, Monaco, monospace;
+}
+
+[data-theme="light"] {
+    --kos-bg-0: #eef0f4;
+    --kos-bg-1: #ffffff;
+    --kos-bg-2: #f5f6f9;
+    --kos-bg-3: #e7e9ef;
+    --kos-border: rgba(0, 0, 0, 0.08);
+    --kos-border-strong: rgba(0, 0, 0, 0.14);
+    --kos-text-0: #1b1d22;
+    --kos-text-1: #40434c;
+    --kos-text-2: #767b88;
+    --kos-wallpaper: linear-gradient(160deg, #dfe6f5 0%, #eef1f8 55%, #e7e0f2 100%);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--kos-bg-0);
+    color: var(--kos-text-0);
+    font-family: var(--kos-font);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+}
+
+button, input, textarea {
+    font-family: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Reduce/disable motion when the user turns animations off in Settings */
+body.kos-no-animations * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--kos-border-strong);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--kos-text-2);
+}
+
+/* Generic small button used across apps */
+.kos-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--kos-bg-3);
+    border: 1px solid var(--kos-border);
+    border-radius: var(--kos-radius-sm);
+    color: var(--kos-text-0);
+    font-size: 13px;
+    transition: background var(--kos-transition-fast), border-color var(--kos-transition-fast);
+}
+.kos-btn:hover {
+    background: var(--kos-bg-2);
+    border-color: var(--kos-border-strong);
+}
+.kos-btn:active {
+    transform: translateY(1px);
+}
+.kos-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.kos-btn.kos-btn-primary {
+    background: var(--kos-accent);
+    border-color: var(--kos-accent);
+    color: #fff;
+}
+.kos-btn.kos-btn-primary:hover {
+    background: var(--kos-accent-strong);
+}
+.kos-btn.kos-btn-danger {
+    background: var(--kos-danger);
+    border-color: var(--kos-danger);
+    color: #fff;
+}
+
+/* Simple modal dialog used for confirm/prompt/properties */
+.kos-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+}
+.kos-modal {
+    background: var(--kos-bg-1);
+    border: 1px solid var(--kos-border);
+    border-radius: var(--kos-radius-md);
+    box-shadow: var(--kos-shadow-lg);
+    width: 360px;
+    max-width: 90vw;
+    padding: 18px;
+}
+.kos-modal h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+}
+.kos-modal p {
+    margin: 0 0 14px;
+    font-size: 13px;
+    color: var(--kos-text-1);
+    line-height: 1.5;
+    word-break: break-word;
+}
+.kos-modal input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--kos-bg-2);
+    border: 1px solid var(--kos-border-strong);
+    border-radius: var(--kos-radius-sm);
+    color: var(--kos-text-0);
+    font-size: 13px;
+    margin-bottom: 14px;
+}
+.kos-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+.kos-modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.kos-modal-table td {
+    padding: 5px 0;
+    vertical-align: top;
+}
+.kos-modal-table td:first-child {
+    color: var(--kos-text-2);
+    width: 90px;
+}

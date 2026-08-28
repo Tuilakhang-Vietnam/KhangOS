@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>KhangOS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖥️</text></svg>">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/desktop.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/windows.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/taskbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/apps.css') }}">
+</head>
+<body>
+
+<!-- ================= DESKTOP ================= -->
+<div id="desktop" class="desktop">
+    <div id="desktop-icons" class="desktop-icons"></div>
+    <div id="window-layer" class="window-layer"></div>
+</div>
+
+<!-- ================= START MENU ================= -->
+<div id="start-menu" class="start-menu hidden">
+    <div class="start-menu-header">
+        <span class="start-menu-logo">🖥️</span>
+        <span class="start-menu-title">KhangOS</span>
+    </div>
+    <input id="start-menu-search" class="start-menu-search" type="text" placeholder="Tìm ứng dụng...">
+    <div id="start-menu-list" class="start-menu-list"></div>
+</div>
+
+<!-- ================= TASKBAR ================= -->
+<div id="taskbar" class="taskbar">
+    <button id="start-button" class="start-button">
+        <span class="start-button-icon">🖥️</span>
+        <span class="start-button-label">KhangOS</span>
+    </button>
+    <div id="taskbar-apps" class="taskbar-apps"></div>
+    <div class="taskbar-tray">
+        <span id="taskbar-clock" class="taskbar-clock">--:--:--</span>
+    </div>
+</div>
+
+<!-- ================= CONTEXT MENU ================= -->
+<div id="context-menu" class="context-menu hidden"></div>
+
+<!-- ================= NOTIFICATIONS ================= -->
+<div id="notification-layer" class="notification-layer"></div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+<script src="{{ url_for('static', filename='js/context-menu.js') }}"></script>
+<script src="{{ url_for('static', filename='js/window-manager.js') }}"></script>
+<script src="{{ url_for('static', filename='js/taskbar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/desktop.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/apps/explorer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/apps/monitor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/apps/settings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/apps/terminal.js') }}"></script>
+<script src="{{ url_for('static', filename='js/apps/about.js') }}"></script>
+</body>
+</html>

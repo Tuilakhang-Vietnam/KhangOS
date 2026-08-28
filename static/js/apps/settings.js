@@ -1,0 +1,175 @@
+/**
+ * apps/settings.js - Settings app, plus KhangSettingsStore, the small
+ * localStorage-backed store that other modules (core.js at boot time)
+ * use to apply the saved theme/wallpaper/animation preference.
+ */
+
+const KhangSettingsStore = (() => {
+    const STORAGE_KEY = "khangos-settings";
+
+    const WALLPAPERS = [
+        { id: "midnight", label: "Midnight", value: "linear-gradient(160deg, #1c2030 0%, #12131a 55%, #1a1425 100%)" },
+        { id: "aurora", label: "Aurora", value: "linear-gradient(160deg, #16323f 0%, #1b1a2e 55%, #241b3a 100%)" },
+        { id: "sunset", label: "Sunset", value: "linear-gradient(160deg, #3a1c30 0%, #23122c 55%, #1a1020 100%)" },
+        { id: "forest", label: "Forest", value: "linear-gradient(160deg, #16241f 0%, #101a1f 55%, #0d1a12 100%)" },
+    ];
+
+    const DEFAULTS = {
+        theme: "dark",
+        wallpaper: { type: "preset", id: "midnight" },
+        animations: true,
+    };
+
+    function load() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return { ...DEFAULTS };
+            const parsed = JSON.parse(raw);
+            return { ...DEFAULTS, ...parsed };
+        } catch (e) {
+            return { ...DEFAULTS };
+        }
+    }
+
+    function save(settings) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (e) {
+            console.error("Could not save settings:", e);
+        }
+    }
+
+    function wallpaperCss(settings) {
+        if (settings.wallpaper && settings.wallpaper.type === "color") {
+            return settings.wallpaper.value;
+        }
+        const preset = WALLPAPERS.find((w) => w.id === (settings.wallpaper && settings.wallpaper.id))
+            || WALLPAPERS[0];
+        return preset.value;
+    }
+
+    function apply(settings) {
+        document.documentElement.setAttribute("data-theme", settings.theme === "light" ? "light" : "dark");
+        document.documentElement.style.setProperty("--kos-wallpaper", wallpaperCss(settings));
+        document.body.classList.toggle("kos-no-animations", settings.animations === false);
+    }
+
+    function applyStoredSettings() {
+        apply(load());
+    }
+
+    function update(partial) {
+        const merged = { ...load(), ...partial };
+        save(merged);
+        apply(merged);
+        return merged;
+    }
+
+    return { load, save, apply, applyStoredSettings, update, WALLPAPERS };
+})();
+
+(function () {
+    function buildRow(labelText, controlEl) {
+        const row = document.createElement("div");
+        row.className = "settings-row";
+        const label = document.createElement("span");
+        label.textContent = labelText;
+        row.append(label, controlEl);
+        return row;
+    }
+
+    function launch() {
+        const settings = KhangSettingsStore.load();
+
+        const content = document.createElement("div");
+        content.className = "settings-app";
+
+        // --- Appearance ---
+        const appearanceSection = document.createElement("div");
+        appearanceSection.className = "settings-section";
+        appearanceSection.innerHTML = "<h4>Appearance</h4>";
+
+        const themeGroup = document.createElement("div");
+        themeGroup.className = "theme-toggle-group";
+        ["dark", "light"].forEach((mode) => {
+            const btn = document.createElement("button");
+            btn.className = "theme-toggle-btn" + (settings.theme === mode ? " active" : "");
+            btn.textContent = mode === "dark" ? "Dark" : "Light";
+            btn.addEventListener("click", () => {
+                const updated = KhangSettingsStore.update({ theme: mode });
+                themeGroup.querySelectorAll(".theme-toggle-btn").forEach((b) => b.classList.remove("active"));
+                btn.classList.add("active");
+            });
+            themeGroup.appendChild(btn);
+        });
+        appearanceSection.appendChild(buildRow("Theme", themeGroup));
+
+        // --- Wallpaper ---
+        const wallpaperSection = document.createElement("div");
+        wallpaperSection.className = "settings-section";
+        wallpaperSection.innerHTML = "<h4>Wallpaper</h4>";
+
+        const swatchGroup = document.createElement("div");
+        swatchGroup.className = "wallpaper-swatches";
+        KhangSettingsStore.WALLPAPERS.forEach((wp) => {
+            const swatch = document.createElement("button");
+            const isActive = settings.wallpaper && settings.wallpaper.type !== "color" && settings.wallpaper.id === wp.id;
+            swatch.className = "wallpaper-swatch" + (isActive ? " active" : "");
+            swatch.style.background = wp.value;
+            swatch.title = wp.label;
+            swatch.addEventListener("click", () => {
+                KhangSettingsStore.update({ wallpaper: { type: "preset", id: wp.id } });
+                swatchGroup.querySelectorAll(".wallpaper-swatch").forEach((s) => s.classList.remove("active"));
+                colorInput.parentElement.classList.remove("active");
+                swatch.classList.add("active");
+            });
+            swatchGroup.appendChild(swatch);
+        });
+
+        const colorInput = document.createElement("input");
+        colorInput.type = "color";
+        colorInput.title = "Custom color";
+        colorInput.className = "wallpaper-swatch";
+        colorInput.style.padding = "0";
+        if (settings.wallpaper && settings.wallpaper.type === "color") {
+            colorInput.value = settings.wallpaper.value;
+            colorInput.classList.add("active");
+        } else {
+            colorInput.value = "#1c2030";
+        }
+        colorInput.addEventListener("input", () => {
+            KhangSettingsStore.update({ wallpaper: { type: "color", value: colorInput.value } });
+            swatchGroup.querySelectorAll(".wallpaper-swatch").forEach((s) => s.classList.remove("active"));
+        });
+        swatchGroup.appendChild(colorInput);
+
+        wallpaperSection.appendChild(buildRow("Preset / custom", swatchGroup));
+
+        // --- Behavior ---
+        const behaviorSection = document.createElement("div");
+        behaviorSection.className = "settings-section";
+        behaviorSection.innerHTML = "<h4>Behavior</h4>";
+
+        const animSwitch = document.createElement("button");
+        animSwitch.className = "kos-switch" + (settings.animations !== false ? " on" : "");
+        animSwitch.addEventListener("click", () => {
+            const nowOn = !animSwitch.classList.contains("on");
+            animSwitch.classList.toggle("on", nowOn);
+            KhangSettingsStore.update({ animations: nowOn });
+        });
+        behaviorSection.appendChild(buildRow("Animations", animSwitch));
+
+        content.append(appearanceSection, wallpaperSection, behaviorSection);
+
+        KhangWM.createWindow({
+            id: "settings",
+            title: "Settings",
+            icon: "⚙️",
+            width: 420,
+            height: 460,
+            content,
+        });
+    }
+
+    registerApp({ id: "settings", name: "Settings", icon: "⚙️", launch });
+})();

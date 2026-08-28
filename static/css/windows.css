@@ -1,0 +1,124 @@
+/* windows.css - window manager chrome: title bar, controls, resize handles */
+
+.kos-window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+    min-height: 180px;
+    background: var(--kos-bg-1);
+    border: 1px solid var(--kos-border);
+    border-radius: var(--kos-radius-md);
+    box-shadow: var(--kos-shadow-md);
+    overflow: hidden;
+    transition: box-shadow var(--kos-transition-fast);
+}
+
+.kos-window.active {
+    box-shadow: var(--kos-shadow-lg);
+    border-color: var(--kos-border-strong);
+}
+
+.kos-window.maximized {
+    border-radius: 0;
+}
+
+.kos-window.minimized {
+    display: none;
+}
+
+.kos-window.dragging,
+.kos-window.resizing {
+    transition: none;
+    user-select: none;
+}
+
+.kos-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 8px 0 12px;
+    background: var(--kos-bg-2);
+    border-bottom: 1px solid var(--kos-border);
+    flex-shrink: 0;
+    cursor: default;
+}
+
+.kos-window.active .kos-titlebar {
+    background: var(--kos-bg-3);
+}
+
+.kos-titlebar-icon {
+    font-size: 15px;
+}
+
+.kos-titlebar-title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--kos-text-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kos-window.active .kos-titlebar-title {
+    color: var(--kos-text-0);
+}
+
+.kos-titlebar-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kos-titlebar-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    border-radius: var(--kos-radius-sm);
+    color: var(--kos-text-1);
+    font-size: 13px;
+    transition: background var(--kos-transition-fast), color var(--kos-transition-fast);
+}
+
+.kos-titlebar-btn:hover {
+    background: var(--kos-bg-1);
+    color: var(--kos-text-0);
+}
+
+.kos-titlebar-btn.kos-close:hover {
+    background: var(--kos-danger);
+    color: #fff;
+}
+
+.kos-window-body {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    background: var(--kos-bg-1);
+    color: var(--kos-text-0);
+    position: relative;
+}
+
+.kos-resize-handle {
+    position: absolute;
+    z-index: 2;
+}
+.kos-resize-handle.n  { top: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; }
+.kos-resize-handle.s  { bottom: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; }
+.kos-resize-handle.e  { top: 8px; right: -3px; bottom: 8px; width: 6px; cursor: ew-resize; }
+.kos-resize-handle.w  { top: 8px; left: -3px; bottom: 8px; width: 6px; cursor: ew-resize; }
+.kos-resize-handle.ne { top: -3px; right: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+.kos-resize-handle.nw { top: -3px; left: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+.kos-resize-handle.se { bottom: -3px; right: -3px; width: 12px; height: 12px; cursor: nwse-resize; }
+.kos-resize-handle.sw { bottom: -3px; left: -3px; width: 12px; height: 12px; cursor: nesw-resize; }
+
+.kos-window.maximized .kos-resize-handle {
+    display: none;
+}

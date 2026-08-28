@@ -1,0 +1,508 @@
+/* apps.css - context menu, notifications, and per-app UI */
+
+/* ---------------- Context menu ---------------- */
+
+.context-menu {
+    position: fixed;
+    min-width: 190px;
+    background: var(--kos-bg-2);
+    border: 1px solid var(--kos-border-strong);
+    border-radius: var(--kos-radius-md);
+    box-shadow: var(--kos-shadow-lg);
+    padding: 6px;
+    z-index: 6000;
+    display: flex;
+    flex-direction: column;
+}
+
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--kos-radius-sm);
+    font-size: 13px;
+    background: transparent;
+    border: none;
+    color: var(--kos-text-0);
+    text-align: left;
+}
+
+.context-menu-item:hover:not(:disabled) {
+    background: var(--kos-bg-3);
+}
+
+.context-menu-item:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.context-menu-item.danger {
+    color: var(--kos-danger);
+}
+
+.context-menu-separator {
+    height: 1px;
+    margin: 6px 4px;
+    background: var(--kos-border);
+}
+
+/* ---------------- Notifications ---------------- */
+
+.notification-layer {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 7000;
+    max-width: 320px;
+}
+
+.kos-notification {
+    background: var(--kos-bg-2);
+    border: 1px solid var(--kos-border-strong);
+    border-left: 3px solid var(--kos-accent);
+    border-radius: var(--kos-radius-md);
+    box-shadow: var(--kos-shadow-md);
+    padding: 12px 14px;
+    animation: kos-notif-in 180ms ease;
+}
+
+.kos-notification.type-success { border-left-color: var(--kos-success); }
+.kos-notification.type-error   { border-left-color: var(--kos-danger); }
+.kos-notification.type-warning { border-left-color: var(--kos-warning); }
+
+.kos-notification-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.kos-notification-close {
+    background: none;
+    border: none;
+    color: var(--kos-text-2);
+    font-size: 13px;
+    line-height: 1;
+    padding: 0;
+}
+
+.kos-notification-message {
+    font-size: 12px;
+    color: var(--kos-text-1);
+    line-height: 1.4;
+}
+
+@keyframes kos-notif-in {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ==================================================
+   EXPLORER
+   ================================================== */
+
+.explorer-app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    font-size: 13px;
+}
+
+.explorer-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-bottom: 1px solid var(--kos-border);
+    background: var(--kos-bg-2);
+    flex-shrink: 0;
+}
+
+.explorer-toolbar .kos-btn {
+    padding: 6px 8px;
+}
+
+.explorer-path {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: var(--kos-bg-1);
+    border: 1px solid var(--kos-border);
+    border-radius: var(--kos-radius-sm);
+    overflow-x: auto;
+    white-space: nowrap;
+    color: var(--kos-text-1);
+}
+
+.explorer-path .crumb {
+    background: none;
+    border: none;
+    color: var(--kos-text-1);
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+.explorer-path .crumb:hover {
+    background: var(--kos-bg-3);
+    color: var(--kos-text-0);
+}
+.explorer-path .crumb-sep {
+    color: var(--kos-text-2);
+}
+
+.explorer-body {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+}
+
+.explorer-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.explorer-list thead th {
+    position: sticky;
+    top: 0;
+    background: var(--kos-bg-2);
+    text-align: left;
+    font-weight: 500;
+    color: var(--kos-text-2);
+    font-size: 12px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--kos-border);
+    z-index: 1;
+}
+
+.explorer-row td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--kos-border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.explorer-row {
+    cursor: default;
+}
+
+.explorer-row:hover {
+    background: var(--kos-bg-2);
+}
+
+.explorer-row.selected {
+    background: rgba(108, 140, 255, 0.18);
+}
+
+.explorer-row .name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.explorer-empty,
+.explorer-loading {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--kos-text-2);
+}
+
+.explorer-statusbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 12px;
+    border-top: 1px solid var(--kos-border);
+    background: var(--kos-bg-2);
+    font-size: 12px;
+    color: var(--kos-text-2);
+    flex-shrink: 0;
+}
+
+.explorer-dropzone-active {
+    outline: 2px dashed var(--kos-accent);
+    outline-offset: -6px;
+}
+
+/* ==================================================
+   SYSTEM MONITOR
+   ================================================== */
+
+.monitor-app {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.monitor-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    font-size: 13px;
+    color: var(--kos-text-1);
+    background: var(--kos-bg-2);
+    border: 1px solid var(--kos-border);
+    border-radius: var(--kos-radius-md);
+    padding: 12px 16px;
+}
+.monitor-summary b {
+    color: var(--kos-text-0);
+}
+
+.monitor-metric {
+    background: var(--kos-bg-2);
+    border: 1px solid var(--kos-border);
+    border-radius: var(--kos-radius-md);
+    padding: 14px 16px;
+}
+
+.monitor-metric-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.monitor-metric-header .metric-value {
+    font-weight: 600;
+    color: var(--kos-text-0);
+}
+
+.monitor-bar-track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--kos-bg-3);
+    overflow: hidden;
+}
+
+.monitor-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--kos-accent);
+    transition: width 400ms ease;
+}
+
+.monitor-bar-fill.warn { background: var(--kos-warning); }
+.monitor-bar-fill.danger { background: var(--kos-danger); }
+
+.monitor-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--kos-text-2);
+}
+
+/* ==================================================
+   TERMINAL
+   ================================================== */
+
+.terminal-app {
+    height: 100%;
+    padding: 10px 12px;
+    background: #0c0d11;
+    color: #d7f7d4;
+    font-family: var(--kos-font-mono);
+    font-size: 13px;
+    overflow-y: auto;
+    line-height: 1.5;
+    cursor: text;
+}
+
+[data-theme="light"] .terminal-app {
+    background: #101216;
+    color: #b9f5c0;
+}
+
+.terminal-line {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.terminal-line.cmd::before {
+    content: "> ";
+    color: var(--kos-accent-strong);
+}
+
+.terminal-line.error {
+    color: #ff8a8a;
+}
+
+.terminal-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.terminal-prompt {
+    color: var(--kos-accent-strong);
+    flex-shrink: 0;
+}
+
+.terminal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+/* ==================================================
+   SETTINGS
+   ================================================== */
+
+.settings-app {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.settings-section h4 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--kos-text-2);
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--kos-border);
+    font-size: 13px;
+}
+
+.settings-row:last-child {
+    border-bottom: none;
+}
+
+.theme-toggle-group,
+.wallpaper-swatches {
+    display: flex;
+    gap: 8px;
+}
+
+.theme-toggle-btn {
+    padding: 6px 14px;
+    border-radius: var(--kos-radius-sm);
+    border: 1px solid var(--kos-border);
+    background: var(--kos-bg-2);
+    color: var(--kos-text-1);
+    font-size: 13px;
+}
+
+.theme-toggle-btn.active {
+    background: var(--kos-accent);
+    border-color: var(--kos-accent);
+    color: #fff;
+}
+
+.wallpaper-swatch {
+    width: 40px;
+    height: 28px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.wallpaper-swatch.active {
+    border-color: var(--kos-accent);
+}
+
+.kos-switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    background: var(--kos-bg-3);
+    border-radius: 999px;
+    border: none;
+    flex-shrink: 0;
+}
+
+.kos-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--kos-text-1);
+    transition: transform var(--kos-transition-fast);
+}
+
+.kos-switch.on {
+    background: var(--kos-accent);
+}
+.kos-switch.on::after {
+    transform: translateX(18px);
+    background: #fff;
+}
+
+/* ==================================================
+   ABOUT
+   ================================================== */
+
+.about-app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    padding: 24px;
+}
+
+.about-logo {
+    font-size: 48px;
+    margin-bottom: 6px;
+}
+
+.about-app h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.about-app .about-tagline {
+    color: var(--kos-text-1);
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.about-app .about-version {
+    font-size: 12px;
+    color: var(--kos-text-2);
+    margin-bottom: 16px;
+}
+
+.about-stack {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.about-stack span {
+    padding: 4px 10px;
+    background: var(--kos-bg-2);
+    border: 1px solid var(--kos-border);
+    border-radius: 999px;
+    font-size: 12px;
+    color: var(--kos-text-1);
+}

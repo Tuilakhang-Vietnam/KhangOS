@@ -1,0 +1,75 @@
+/* desktop.css - wallpaper, desktop icons, window layer */
+
+.desktop {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 48px); /* leave room for taskbar */
+    background: var(--kos-wallpaper);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.desktop.kos-drag-over::after {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border: 2px dashed var(--kos-accent);
+    border-radius: var(--kos-radius-lg);
+    pointer-events: none;
+}
+
+.desktop-icons {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 14px;
+}
+
+.desktop-icon {
+    position: absolute;
+    width: 88px;
+    height: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 8px 4px;
+    border-radius: var(--kos-radius-sm);
+    text-align: center;
+    cursor: default;
+}
+
+.desktop-icon .icon-glyph {
+    font-size: 34px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.desktop-icon .icon-label {
+    font-size: 12px;
+    color: var(--kos-text-0);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    max-width: 84px;
+    overflow-wrap: break-word;
+}
+
+.desktop-icon.selected {
+    background: rgba(108, 140, 255, 0.28);
+    outline: 1px solid rgba(108, 140, 255, 0.55);
+}
+
+.desktop-icon:hover:not(.selected) {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.window-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.window-layer > .kos-window {
+    pointer-events: auto;
+}
