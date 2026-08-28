@@ -48,6 +48,10 @@
 <div id="notification-layer" class="notification-layer"></div>
 
 <!-- ================= SCRIPTS ================= -->
+<script>
+    window.KHANGOS_VERSION = "{{ khangos_version }}";
+</script>
+
 <script src="{{ url_for('static', filename='js/api.js') }}"></script>
 <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
 <script src="{{ url_for('static', filename='js/context-menu.js') }}"></script>

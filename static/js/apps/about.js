@@ -10,7 +10,7 @@
             <div class="about-logo">🖥️</div>
             <h2>KhangOS</h2>
             <div class="about-tagline">Web-based operating environment</div>
-            <div class="about-version">Version 0.1.0</div>
+            <div class="about-version">Version ${window.KHANGOS_VERSION}</div>
             <div class="about-stack">
                 <span>Python</span>
                 <span>Flask</span>
