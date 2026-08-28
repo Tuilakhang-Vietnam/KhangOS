@@ -12,6 +12,16 @@ const KhangSettingsStore = (() => {
         { id: "aurora", label: "Aurora", value: "linear-gradient(160deg, #16323f 0%, #1b1a2e 55%, #241b3a 100%)" },
         { id: "sunset", label: "Sunset", value: "linear-gradient(160deg, #3a1c30 0%, #23122c 55%, #1a1020 100%)" },
         { id: "forest", label: "Forest", value: "linear-gradient(160deg, #16241f 0%, #101a1f 55%, #0d1a12 100%)" },
+
+        {
+            id: "bing-iotd",
+            label: "Image of the Day",
+            type: "bing-iotd",
+            value: "linear-gradient(160deg, #202020 0%, #101010 100%)",
+            image: null,
+            title: "",
+            copyright: "",
+        },
     ];
 
     const DEFAULTS = {
@@ -40,15 +50,27 @@ const KhangSettingsStore = (() => {
     }
 
     function wallpaperCss(settings) {
-        if (wallpaper?.type === "bing-iotd" && wallpaper.url) {
-            return `url("${wallpaper.url}")`;
-        }
-
         if (settings.wallpaper && settings.wallpaper.type === "color") {
             return settings.wallpaper.value;
         }
-        const preset = WALLPAPERS.find((w) => w.id === (settings.wallpaper && settings.wallpaper.id))
-            || WALLPAPERS[0];
+
+        if (
+            settings.wallpaper &&
+            settings.wallpaper.type === "bing-iotd" &&
+            settings.wallpaper.url
+        ) {
+            return `url("${settings.wallpaper.url}")`;
+        }
+
+        const preset =
+            WALLPAPERS.find(
+                (w) => w.id === (settings.wallpaper && settings.wallpaper.id)
+            ) || WALLPAPERS[0];
+
+        if (preset.type === "bing-iotd" && preset.image) {
+            return `url("${preset.image}")`;
+        }
+
         return preset.value;
     }
 
@@ -176,18 +198,151 @@ const KhangSettingsStore = (() => {
         swatchGroup.className = "wallpaper-swatches";
         KhangSettingsStore.WALLPAPERS.forEach((wp) => {
             const swatch = document.createElement("button");
-            const isActive = settings.wallpaper && settings.wallpaper.type !== "color" && settings.wallpaper.id === wp.id;
-            swatch.className = "wallpaper-swatch" + (isActive ? " active" : "");
-            swatch.style.background = wp.value;
+
+            const isActive =
+                settings.wallpaper &&
+                settings.wallpaper.type !== "color" &&
+                settings.wallpaper.id === wp.id;
+
+            swatch.className =
+                "wallpaper-swatch" + (isActive ? " active" : "");
+
             swatch.title = wp.label;
+            swatch.setAttribute("aria-label", wp.label);
+
+            if (wp.type === "bing-iotd") {
+                // Placeholder trước khi Bing trả ảnh
+                swatch.style.background = wp.value;
+                swatch.classList.add("wallpaper-iotd");
+
+                const loading = document.createElement("span");
+                loading.className = "wallpaper-iotd-label";
+                loading.textContent = "🌄 Image of the Day";
+
+                swatch.appendChild(loading);
+            } else {
+                swatch.style.background = wp.value;
+            }
+
             swatch.addEventListener("click", () => {
-                KhangSettingsStore.update({ wallpaper: { type: "preset", id: wp.id } });
-                swatchGroup.querySelectorAll(".wallpaper-swatch").forEach((s) => s.classList.remove("active"));
+                if (wp.type === "bing-iotd") {
+                    if (!wp.image) {
+                        showNotification(
+                            "Wallpaper",
+                            "Image of the Day chưa tải xong."
+                        );
+                        return;
+                    }
+
+                    KhangSettingsStore.update({
+                        wallpaper: {
+                            type: "bing-iotd",
+                            id: "bing-iotd",
+                            url: wp.image,
+                            title: wp.title || "",
+                            copyright: wp.copyright || "",
+                        },
+                    });
+                } else {
+                    KhangSettingsStore.update({
+                        wallpaper: {
+                            type: "preset",
+                            id: wp.id,
+                        },
+                    });
+                }
+
+                swatchGroup
+                    .querySelectorAll(".wallpaper-swatch")
+                    .forEach((s) => s.classList.remove("active"));
+
                 colorInput.parentElement.classList.remove("active");
+
                 swatch.classList.add("active");
             });
+
             swatchGroup.appendChild(swatch);
+
+            // Lưu lại để loadBingIotdPreview() tìm được card
+            if (wp.type === "bing-iotd") {
+                swatch.dataset.wallpaperId = "bing-iotd";
+            }
         });
+
+        async function loadBingIotdPreview() {
+            try {
+                const response = await fetch("/api/wallpaper");
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (!data.success || !data.url) {
+                    throw new Error(data.error || "No Bing wallpaper returned.");
+                }
+
+                const iotd = KhangSettingsStore.WALLPAPERS.find(
+                    (wp) => wp.id === "bing-iotd"
+                );
+
+                if (!iotd) {
+                    return;
+                }
+
+                iotd.image = data.url;
+                iotd.title = data.title || "Image of the Day";
+                iotd.copyright = data.copyright || "";
+
+                const swatch = swatchGroup.querySelector(
+                    '[data-wallpaper-id="bing-iotd"]'
+                );
+
+                if (!swatch) {
+                    return;
+                }
+
+                // Preview thật của Bing
+                swatch.style.backgroundImage = `url("${data.url}")`;
+                swatch.style.backgroundSize = "cover";
+                swatch.style.backgroundPosition = "center";
+
+                const label = swatch.querySelector(".wallpaper-iotd-label");
+
+                if (label) {
+                    label.textContent = "🌄 Image of the Day";
+                }
+
+                // Nếu IOTD đang được chọn thì cập nhật URL mới
+                // nhưng chỉ áp dụng nếu người dùng đang dùng IOTD.
+                const current = KhangSettingsStore.load();
+
+                if (
+                    current.wallpaper &&
+                    current.wallpaper.type === "bing-iotd"
+                ) {
+                    KhangSettingsStore.update({
+                        wallpaper: {
+                            type: "bing-iotd",
+                            id: "bing-iotd",
+                            url: data.url,
+                            title: data.title || "",
+                            copyright: data.copyright || "",
+                        },
+                    });
+
+                    swatch.classList.add("active");
+                }
+            } catch (error) {
+                console.error(
+                    "Failed to load Bing Image of the Day:",
+                    error
+                );
+            }
+        }
+
+        loadBingIotdPreview();
 
         const colorInput = document.createElement("input");
         colorInput.type = "color";
