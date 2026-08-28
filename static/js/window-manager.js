@@ -58,16 +58,32 @@ const KhangWM = (() => {
     function minimizeWindow(id) {
         const win = windows.get(id);
         if (!win) return;
-        win.el.classList.add("minimized");
-        win.minimized = true;
-        emit("khangos:window-minimize", { id });
+        win.el.classList.add("minimizing");
+
+        setTimeout(() => {
+            win.el.classList.remove("minimizing");
+            win.el.classList.add("minimized");
+            win.minimized = true;
+
+            emit("khangos:window-minimize", { id });
+        }, 160);
     }
 
     function restoreWindow(id) {
         const win = windows.get(id);
         if (!win) return;
+        
         win.el.classList.remove("minimized");
+        win.el.classList.add("restoring");
         win.minimized = false;
+
+        emit("khangos:window-restore", { id });
+        focusWindow(id);
+
+        setTimeout(() => {
+            win.el.classList.remove("restoring");
+        }, 180);
+
         emit("khangos:window-restore", { id });
         focusWindow(id);
     }
