@@ -27,8 +27,8 @@ const KhangDesktop = (() => {
             const image = new Image();
 
             image.onload = () => {
-                desktop.style.setProperty(
-                    "--khangos-wallpaper",
+                document.documentElement.style.setProperty(
+                    "--kos-wallpaper",
                     `url("${data.url}")`
                 );
                 desktop.classList.add("wallpaper-loaded");
