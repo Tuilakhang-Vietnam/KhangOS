@@ -64,8 +64,14 @@ const KhangDesktop = (() => {
 
         if (gridEnabled) {
             container.querySelectorAll(".desktop-icon").forEach((el) => {
-                el.style.left = `${snapToGrid(el.offsetLeft)}px`;
-                el.style.top = `${snapToGrid(el.offsetTop)}px`;
+                const position = findFreeGridPosition(
+                    el,
+                    el.offsetLeft,
+                    el.offsetTop
+                );
+
+                el.style.left = `${position.left}px`;
+                el.style.top = `${position.top}px`;
             });
         }
     }
@@ -98,14 +104,14 @@ const KhangDesktop = (() => {
             document.removeEventListener("mousemove", onMove);
             document.removeEventListener("mouseup", onUp);
             if (gridEnabled && moved) {
-                const maxLeft = container.clientWidth - el.offsetWidth;
-                const maxTop = container.clientHeight - el.offsetHeight;
+                const position = findFreeGridPosition(
+                    el,
+                    el.offsetLeft,
+                    el.offsetTop
+                );
 
-                const left = Math.min(snapToGrid(el.offsetLeft), maxLeft);
-                const top = Math.min(snapToGrid(el.offsetTop), maxTop);
-
-                el.style.left = `${Math.max(0, left)}px`;
-                el.style.top = `${Math.max(0, top)}px`;
+                el.style.left = `${position.left}px`;
+                el.style.top = `${position.top}px`;
             }
 
             if (!moved) {
