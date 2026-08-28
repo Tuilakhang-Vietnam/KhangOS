@@ -15,9 +15,28 @@ const KhangDesktop = (() => {
     const container = document.getElementById("desktop-icons");
     const desktop = document.getElementById("desktop");
 
+    const GRID_SIZE = 100;
+    let gridEnabled = localStorage.getItem("khangos-desktop-grid") === "true";
+
     function deselectAll() {
         container.querySelectorAll(".desktop-icon.selected").forEach((el) => el.classList.remove("selected"));
     }
+
+    function snapToGrid(value) {
+    return Math.round(value / GRID_SIZE) * GRID_SIZE;
+}
+
+    function toggleGrid() {
+        gridEnabled = !gridEnabled;
+        localStorage.setItem("khangos-desktop-grid", String(gridEnabled));
+
+        if (gridEnabled) {
+            container.querySelectorAll(".desktop-icon").forEach((el) => {
+                el.style.left = `${snapToGrid(el.offsetLeft)}px`;
+                el.style.top = `${snapToGrid(el.offsetTop)}px`;
+            });
+    }
+}
 
     function startIconDrag(el, evt) {
         evt.preventDefault();
@@ -33,9 +52,19 @@ const KhangDesktop = (() => {
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
             const maxLeft = container.clientWidth - el.offsetWidth;
             const maxTop = container.clientHeight - el.offsetHeight;
-            el.style.left = `${Math.max(0, Math.min(originLeft + dx, maxLeft))}px`;
-            el.style.top = `${Math.max(0, Math.min(originTop + dy, maxTop))}px`;
+
+            let left = Math.max(0, Math.min(originLeft + dx, maxLeft));
+            let top = Math.max(0, Math.min(originTop + dy, maxTop));
+
+            if (gridEnabled) {
+                left = snapToGrid(left);
+                top = snapToGrid(top);
+            }
+
+            el.style.left = `${left}px`;
+            el.style.top = `${top}px`;
         }
+
         function onUp() {
             document.removeEventListener("mousemove", onMove);
             document.removeEventListener("mouseup", onUp);
@@ -64,9 +93,12 @@ const KhangDesktop = (() => {
         deselectAll();
         showContextMenu(evt.clientX, evt.clientY, [
             { label: "Refresh", icon: "⟳", action: () => showNotification("Desktop", "Đã làm mới desktop.") },
+            {
+                label: gridEnabled ? "Grid ✓" : "Grid",
+                icon: "▦",
+                action: toggleGrid,
+            },
             { label: "Settings", icon: "⚙️", action: () => KhangCore.openApp("settings") },
-            { separator: true },
-            { label: "About KhangOS", icon: "ℹ️", action: () => KhangCore.openApp("about") },
         ]);
     }
 
@@ -75,8 +107,13 @@ const KhangDesktop = (() => {
         ICONS.forEach((def, index) => {
             const el = document.createElement("div");
             el.className = "desktop-icon";
-            el.style.left = "14px";
-            el.style.top = `${14 + index * 100}px`;
+
+            const initialLeft = gridEnabled ? 0 : 14;
+            const initialTop = gridEnabled ? index * GRID_SIZE : 14 + index * 100;
+
+            el.style.left = `${initialLeft}px`;
+            el.style.top = `${initialTop}px`;
+
             el.dataset.appId = def.id;
 
             const glyph = document.createElement("div");
