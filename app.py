@@ -41,7 +41,7 @@ ROOT_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
 
-KHANGOS_VERSION = "0.1.1"
+KHANGOS_VERSION = "0.1.2"
 
 # 256 MB upload cap - generous for a LAN file manager, prevents runaway uploads.
 app.config["MAX_CONTENT_LENGTH"] = 256 * 1024 * 1024
