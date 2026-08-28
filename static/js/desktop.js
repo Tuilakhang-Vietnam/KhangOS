@@ -23,8 +23,8 @@ const KhangDesktop = (() => {
     }
 
     function snapToGrid(value) {
-    return Math.round(value / GRID_SIZE) * GRID_SIZE;
-}
+        return Math.round(value / GRID_SIZE) * GRID_SIZE;
+    }
 
     function toggleGrid() {
         gridEnabled = !gridEnabled;
@@ -35,8 +35,8 @@ const KhangDesktop = (() => {
                 el.style.left = `${snapToGrid(el.offsetLeft)}px`;
                 el.style.top = `${snapToGrid(el.offsetTop)}px`;
             });
+        }
     }
-}
 
     function startIconDrag(el, evt) {
         evt.preventDefault();
@@ -49,17 +49,14 @@ const KhangDesktop = (() => {
         function onMove(e) {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
+
             if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+
             const maxLeft = container.clientWidth - el.offsetWidth;
             const maxTop = container.clientHeight - el.offsetHeight;
 
-            let left = Math.max(0, Math.min(originLeft + dx, maxLeft));
-            let top = Math.max(0, Math.min(originTop + dy, maxTop));
-
-            if (gridEnabled) {
-                left = snapToGrid(left);
-                top = snapToGrid(top);
-            }
+            const left = Math.max(0, Math.min(originLeft + dx, maxLeft));
+            const top = Math.max(0, Math.min(originTop + dy, maxTop));
 
             el.style.left = `${left}px`;
             el.style.top = `${top}px`;
@@ -68,6 +65,17 @@ const KhangDesktop = (() => {
         function onUp() {
             document.removeEventListener("mousemove", onMove);
             document.removeEventListener("mouseup", onUp);
+            if (gridEnabled && moved) {
+                const maxLeft = container.clientWidth - el.offsetWidth;
+                const maxTop = container.clientHeight - el.offsetHeight;
+
+                const left = Math.min(snapToGrid(el.offsetLeft), maxLeft);
+                const top = Math.min(snapToGrid(el.offsetTop), maxTop);
+
+                el.style.left = `${Math.max(0, left)}px`;
+                el.style.top = `${Math.max(0, top)}px`;
+            }
+
             if (!moved) {
                 deselectAll();
                 el.classList.add("selected");
