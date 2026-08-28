@@ -129,7 +129,7 @@
                         break;
 
                     case "version":
-                        print("KhangOS v0.1.0");
+                        print(`KhangOS v${window.KHANGOS_VERSION}`);
                         break;
 
                     default:
@@ -173,7 +173,7 @@
             }
         });
 
-        print("KhangOS Terminal v0.1.0 - type 'help' for a list of commands.");
+        print(`KhangOS Terminal v${window.KHANGOS_VERSION} - type 'help' for a list of commands.`);
         updatePrompt();
 
         KhangWM.createWindow({

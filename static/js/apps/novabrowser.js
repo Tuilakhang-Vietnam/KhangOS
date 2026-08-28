@@ -7,12 +7,14 @@
  */
 
 (function () {
-    const HOME_URL = "https://www.bing.com/";
+    const HOME_URL = "nova://home";
 
     function normalizeInput(value) {
         const input = value.trim();
 
-        if (!input) return HOME_URL;
+        if (!input) {
+            return HOME_URL;
+        }
 
         // Explicit URL
         if (/^[a-z][a-z0-9+.-]*:\/\//i.test(input)) {
@@ -28,9 +30,17 @@
         return `https://www.bing.com/search?q=${encodeURIComponent(input)}`;
     }
 
+    function escapeHtml(value) {
+        const div = document.createElement("div");
+        div.textContent = value;
+        return div.innerHTML;
+    }
+
     function launch() {
         const content = document.createElement("div");
         content.className = "novabrowser-app";
+
+        /* ================= Toolbar ================= */
 
         const toolbar = document.createElement("div");
         toolbar.className = "novabrowser-toolbar";
@@ -74,59 +84,293 @@
             goBtn
         );
 
-        const loading = document.createElement("div");
-        loading.className = "novabrowser-loading";
-        loading.textContent = "Loading…";
-
-        const frame = document.createElement("iframe");
-        frame.className = "novabrowser-frame";
-        frame.title = "NovaBrowser";
-        frame.referrerPolicy = "strict-origin-when-cross-origin";
+        /* ================= Body ================= */
 
         const body = document.createElement("div");
         body.className = "novabrowser-body";
-        body.append(loading, frame);
 
         content.append(toolbar, body);
 
         let currentUrl = HOME_URL;
+        let frame = null;
+        let loading = null;
+        let navigationTimer = null;
 
         function updateAddress() {
             address.value = currentUrl;
         }
 
         function setLoading(value) {
+            if (!loading) return;
             loading.classList.toggle("visible", value);
+        }
+
+        function createLoading() {
+            loading = document.createElement("div");
+            loading.className = "novabrowser-loading";
+            loading.textContent = "Loading…";
+            body.appendChild(loading);
+        }
+
+        function createFrame() {
+            frame = document.createElement("iframe");
+
+            frame.className = "novabrowser-frame";
+            frame.title = "NovaBrowser";
+            frame.referrerPolicy = "strict-origin-when-cross-origin";
+
+            frame.addEventListener("load", () => {
+                setLoading(false);
+                clearTimeout(navigationTimer);
+
+                try {
+                    currentUrl = frame.contentWindow.location.href;
+                    updateAddress();
+
+                    KhangWM.setTitle(
+                        "novabrowser",
+                        `NovaBrowser — ${currentUrl}`
+                    );
+                } catch {
+                    // Cross-origin page.
+                    // The browser security model prevents reading its URL.
+                }
+            });
+
+            body.appendChild(frame);
+        }
+
+        function showHomePage() {
+            clearTimeout(navigationTimer);
+
+            body.innerHTML = "";
+
+            frame = null;
+            loading = null;
+
+            currentUrl = HOME_URL;
+            address.value = "";
+
+            const home = document.createElement("div");
+            home.className = "novabrowser-home";
+
+            home.innerHTML = `
+        <div class="novabrowser-home-content">
+
+            <div class="novabrowser-home-brand">
+                <div class="novabrowser-home-logo">🌐</div>
+
+                <div class="novabrowser-home-title">
+                    <h1>NovaBrowser</h1>
+                    <p>The web, your way.</p>
+                </div>
+            </div>
+
+            <div class="novabrowser-home-search">
+                <span class="novabrowser-home-search-icon">⌕</span>
+
+                <input
+                    type="text"
+                    id="novabrowser-home-input"
+                    placeholder="Search or enter a URL"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+
+                <button
+                    id="novabrowser-home-go"
+                    title="Search"
+                >
+                    →
+                </button>
+            </div>
+
+            <div class="novabrowser-shortcuts">
+
+                <button class="novabrowser-shortcut"
+                        data-url="https://www.google.com">
+                    <span class="shortcut-icon">🔵</span>
+                    <span>Google</span>
+                </button>
+
+                <button class="novabrowser-shortcut"
+                        data-url="https://www.youtube.com">
+                    <span class="shortcut-icon">▶️</span>
+                    <span>YouTube</span>
+                </button>
+
+                <button class="novabrowser-shortcut"
+                        data-url="https://github.com">
+                    <span class="shortcut-icon">🐙</span>
+                    <span>GitHub</span>
+                </button>
+
+                <button class="novabrowser-shortcut"
+                        data-url="https://www.bing.com">
+                    <span class="shortcut-icon">🔎</span>
+                    <span>Bing</span>
+                </button>
+
+            </div>
+
+            <div class="novabrowser-home-footer">
+                <span>KhangOS</span>
+                <span>•</span>
+                <span>NovaBrowser</span>
+            </div>
+
+        </div>
+    `;
+
+            body.appendChild(home);
+
+            const input = home.querySelector("#novabrowser-home-input");
+            const button = home.querySelector("#novabrowser-home-go");
+
+            function search() {
+                const value = input.value.trim();
+
+                if (!value) return;
+
+                navigate(value);
+            }
+
+            button.addEventListener("click", search);
+
+            input.addEventListener("keydown", (evt) => {
+                if (evt.key === "Enter") {
+                    evt.preventDefault();
+                    search();
+                }
+
+                evt.stopPropagation();
+            });
+
+            home.querySelectorAll(".novabrowser-shortcut").forEach((shortcut) => {
+                shortcut.addEventListener("click", () => {
+                    navigate(shortcut.dataset.url);
+                });
+            });
+
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function showBrowserParentMessage(url) {
+            clearTimeout(navigationTimer);
+
+            body.innerHTML = "";
+
+            frame = null;
+            loading = null;
+
+            const message = document.createElement("div");
+            message.className = "novabrowser-parent-message";
+
+            message.innerHTML = `
+                <div class="novabrowser-parent-icon">🌐</div>
+
+                <h2>Trang đang được mở</h2>
+
+                <p>
+                    Trang này không thể hiển thị bên trong NovaBrowser.
+                    Nó đang được mở trong trình duyệt mẹ.
+                </p>
+
+                <span class="novabrowser-parent-url">
+                    ${escapeHtml(url)}
+                </span>
+            `;
+
+            body.appendChild(message);
+        }
+
+        function openInParentBrowser(url) {
+            window.open(url, "_blank", "noopener,noreferrer");
+            showBrowserParentMessage(url);
         }
 
         function navigate(value) {
             const url = normalizeInput(value);
 
+            // Home page
+            if (url === HOME_URL) {
+                showHomePage();
+                return;
+            }
+
             currentUrl = url;
             updateAddress();
+
+            body.innerHTML = "";
+
+            frame = null;
+            loading = null;
+
+            createLoading();
+            createFrame();
+
             setLoading(true);
 
             frame.src = url;
-            KhangWM.setTitle("novabrowser", `NovaBrowser — ${url}`);
+
+            clearTimeout(navigationTimer);
+
+            /*
+             * If the page refuses to be embedded, the browser may block
+             * the iframe. After a short delay, fall back to the host browser.
+             */
+            navigationTimer = setTimeout(() => {
+                if (!frame || !document.contains(frame)) {
+                    return;
+                }
+
+                try {
+                    const frameUrl = frame.contentWindow.location.href;
+
+                    if (
+                        frameUrl &&
+                        frameUrl !== "about:blank"
+                    ) {
+                        clearTimeout(navigationTimer);
+                        return;
+                    }
+                } catch {
+                    // Cross-origin access is blocked.
+                    // Treat this as a possible iframe restriction.
+                }
+
+                openInParentBrowser(url);
+            }, 2500);
         }
 
+        /* ================= Navigation ================= */
+
         backBtn.addEventListener("click", () => {
+            if (!frame) return;
+
             try {
                 frame.contentWindow.history.back();
             } catch {
-                // Cross-origin navigation is controlled by the host browser.
+                // Browser security restriction.
             }
         });
 
         forwardBtn.addEventListener("click", () => {
+            if (!frame) return;
+
             try {
                 frame.contentWindow.history.forward();
             } catch {
-                // Cross-origin navigation is controlled by the host browser.
+                // Browser security restriction.
             }
         });
 
         reloadBtn.addEventListener("click", () => {
+            if (!frame) {
+                navigate(currentUrl);
+                return;
+            }
+
             setLoading(true);
 
             try {
@@ -153,22 +397,7 @@
             evt.stopPropagation();
         });
 
-        frame.addEventListener("load", () => {
-            setLoading(false);
-
-            try {
-                currentUrl = frame.contentWindow.location.href;
-                updateAddress();
-                KhangWM.setTitle(
-                    "novabrowser",
-                    `NovaBrowser — ${currentUrl}`
-                );
-            } catch {
-                // Cross-origin page: browser security prevents reading its URL.
-            }
-        });
-
-        navigate(HOME_URL);
+        /* ================= Window ================= */
 
         KhangWM.createWindow({
             id: "novabrowser",
@@ -178,6 +407,9 @@
             height: 600,
             content,
         });
+
+        // Open NovaBrowser home page after the window exists.
+        showHomePage();
     }
 
     registerApp({
