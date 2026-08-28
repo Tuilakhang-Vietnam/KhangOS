@@ -16,6 +16,8 @@ machine on the same network).
 
 from pathlib import Path
 
+import requests
+
 from flask import Flask, jsonify, request, render_template, send_file
 
 from backend.filesystem import (
@@ -207,5 +209,3 @@ def api_system_status():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=False)
-
-import requests
